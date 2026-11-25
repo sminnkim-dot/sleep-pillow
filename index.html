@@ -7,22 +7,15 @@
 <title>수면 베개</title>
 <style>
   :root {
-    --night: #1B2140;
-    --surface: #262D52;
-    --line: #3A4266;
-    --moon: #ECE6D3;
-    --dim: #A9A6B8;
-    --sleep: #9D94D6;
-    --toss: #E6AE5C;
-    --away: #E07C7C;
-    --before: #4A5280;
+    --night: #1B2140; --surface: #262D52; --line: #3A4266;
+    --moon: #ECE6D3; --dim: #A9A6B8;
+    --sleep: #9D94D6; --toss: #E6AE5C; --away: #E07C7C; --before: #4A5280;
     color-scheme: dark;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; }
+  html, body { margin: 0; }
   body {
-    background: var(--night);
-    color: var(--moon);
+    background: var(--night); color: var(--moon);
     font-family: -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
     line-height: 1.5;
     padding: env(safe-area-inset-top, 0px) 20px calc(env(safe-area-inset-bottom, 0px) + 24px);
@@ -36,6 +29,10 @@
   .link.on .dot { background: var(--sleep); box-shadow: 0 0 0 4px rgba(157,148,214,0.25); }
   .link.on { color: var(--moon); }
 
+  .tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface); border-radius: 12px; padding: 4px; margin: 8px 0 4px; }
+  .tabs button { background: transparent; color: var(--dim); padding: 10px; border-radius: 9px; }
+  .tabs button[aria-selected="true"] { background: var(--night); color: var(--moon); font-weight: 600; }
+
   .night { padding: 24px 0 16px; }
   .night .state { color: var(--dim); font-size: 0.95rem; margin: 0 0 4px; }
   .night .clock { font-size: 3.4rem; font-weight: 300; letter-spacing: -0.03em; margin: 0; line-height: 1.1; font-variant-numeric: tabular-nums; }
@@ -43,10 +40,8 @@
 
   .band { display: flex; height: 44px; border-radius: 10px; overflow: hidden; background: var(--surface); margin-top: 8px; }
   .band div { flex: 1 1 0; min-width: 0; }
-  .band .sleep { background: var(--sleep); }
-  .band .toss { background: var(--toss); }
-  .band .away { background: var(--away); }
-  .band .before { background: var(--before); }
+  .band .sleep { background: var(--sleep); } .band .toss { background: var(--toss); }
+  .band .away { background: var(--away); } .band .before { background: var(--before); }
   .band .empty { display: flex; align-items: center; padding: 0 14px; color: var(--dim); font-size: 0.9rem; flex: 1; }
   .band-ends { display: flex; justify-content: space-between; color: var(--dim); font-size: 0.8rem; margin-top: 6px; font-variant-numeric: tabular-nums; }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: 0.85rem; color: var(--dim); }
@@ -59,19 +54,14 @@
   .caveat { color: var(--dim); font-size: 0.8rem; margin: 0 0 20px; }
 
   .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  button {
-    font: inherit; font-size: 1rem; border: 0; border-radius: 12px; padding: 14px 12px;
-    background: var(--surface); color: var(--moon); cursor: pointer;
-  }
+  button { font: inherit; font-size: 1rem; border: 0; border-radius: 12px; padding: 14px 12px; background: var(--surface); color: var(--moon); cursor: pointer; }
   button.primary { background: var(--sleep); color: var(--night); font-weight: 600; }
   button:disabled { opacity: 0.45; cursor: default; }
   button:focus-visible, input:focus-visible { outline: 2px solid var(--toss); outline-offset: 2px; }
   .wide { grid-column: 1 / -1; }
-
   .demo { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0 0; font-size: 0.9rem; }
   .demo input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--sleep); }
   .demo small { display: block; color: var(--dim); font-size: 0.8rem; }
-
   .notice { margin: 14px 0 0; padding: 12px 14px; border-radius: 12px; background: rgba(224,124,124,0.12); color: var(--away); font-size: 0.9rem; display: none; }
   .notice.show { display: block; }
 
@@ -79,12 +69,31 @@
   ol.log { list-style: none; margin: 0; padding: 0; }
   ol.log li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 0.95rem; }
   ol.log time { color: var(--dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  ol.log .toss { color: var(--toss); }
-  ol.log .away { color: var(--away); }
-  ol.log .now { color: var(--moon); }
+  ol.log .toss { color: var(--toss); } ol.log .away { color: var(--away); } ol.log .now { color: var(--moon); }
   ol.log em { font-style: normal; color: var(--dim); }
   .muted { color: var(--dim); font-size: 0.9rem; }
-  .clear { margin-top: 20px; background: transparent; color: var(--dim); padding: 8px 0; }
+  .textbtn { background: transparent; color: var(--dim); padding: 8px 0; margin-top: 16px; }
+
+  /* 달력 */
+  .month { display: flex; align-items: center; justify-content: space-between; margin: 24px 0 12px; }
+  .month h2 { margin: 0; font-size: 1.3rem; font-weight: 500; }
+  .month button { width: 44px; height: 44px; padding: 0; font-size: 1.2rem; }
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal .wd { text-align: center; color: var(--dim); font-size: 0.8rem; padding-bottom: 4px; }
+  .cal .day { aspect-ratio: 1 / 1.15; border-radius: 10px; background: transparent; padding: 6px 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--dim); }
+  .cal .day.has { background: var(--surface); color: var(--moon); }
+  .cal .day.has b { font-size: 0.95rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .cal .day.good b { color: var(--sleep); }
+  .cal .day.mid b { color: var(--toss); }
+  .cal .day.low b { color: var(--away); }
+  .cal .day.sel { outline: 2px solid var(--moon); }
+  .cal .day.today { box-shadow: inset 0 -3px 0 var(--sleep); }
+  .cal .day small { font-size: 0.65rem; color: var(--dim); }
+  .cal-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; font-size: 0.82rem; color: var(--dim); }
+  .detail { margin-top: 24px; }
+  .detail h3 { font-size: 1.05rem; font-weight: 600; margin: 0 0 4px; }
+  .tag { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: var(--before); font-size: 0.75rem; color: var(--moon); vertical-align: 2px; }
+  [hidden] { display: none !important; }
 </style>
 </head>
 <body>
@@ -94,80 +103,76 @@
     <span class="link" id="link"><span class="dot"></span><span id="linkText">연결 안 됨</span></span>
   </header>
 
-  <section class="night">
-    <p class="state" id="state">기록 시작 전</p>
-    <p class="clock" id="clock">0:00</p>
-    <p class="since" id="since">수면 시작을 누르면 시간이 흘러요</p>
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tabTonight" aria-selected="true">오늘 밤</button>
+    <button role="tab" id="tabCal" aria-selected="false">달력</button>
+  </div>
+
+  <!-- ========== 오늘 밤 ========== -->
+  <section id="viewTonight">
+    <div class="night">
+      <p class="state" id="state">기록 시작 전</p>
+      <p class="clock" id="clock">0:00</p>
+      <p class="since" id="since">수면 시작을 누르면 시간이 흘러요</p>
+    </div>
+    <div id="tonightBody"></div>
+
+    <div class="actions">
+      <button class="primary wide" id="connectBtn">베개 연결하기</button>
+      <button id="startBtn">수면 시작</button>
+      <button id="stopBtn" disabled>수면 끝내기</button>
+    </div>
+    <label class="demo">
+      <input type="checkbox" id="demoBox">
+      <span>시연 모드<small id="demoText"></small></span>
+    </label>
+    <p class="notice" id="notice"></p>
   </section>
 
-  <div class="band" id="band"><div class="empty">수면 기록이 여기에 그려져요</div></div>
-  <div class="band-ends"><span id="bandStart">누운 시각</span><span id="bandEnd">지금</span></div>
-  <div class="legend">
-    <span><i style="background:var(--sleep)"></i>잠</span>
-    <span><i style="background:var(--toss)"></i>뒤척임</span>
-    <span><i style="background:var(--away)"></i>깸(베개에서 벗어남)</span>
-    <span><i style="background:var(--before)"></i>잠들기 전</span>
-  </div>
-
-  <div class="report">
-    <div class="fact"><b id="onset">–</b><span>잠든 시각</span></div>
-    <div class="fact"><b id="latency">–</b><span>잠드는 데 걸린 시간</span></div>
-    <div class="fact"><b id="total">–</b><span>총 수면 시간</span></div>
-    <div class="fact"><b id="eff">–</b><span>수면 효율</span></div>
-    <div class="fact"><b id="tosses">0회</b><span>뒤척임</span></div>
-    <div class="fact"><b id="wakes">0회</b><span>중간에 깸</span></div>
-  </div>
-  <p class="caveat">움직임으로 추정한 값이에요. 깊은 잠과 렘수면은 구분하지 못해요.</p>
-
-  <div class="actions">
-    <button class="primary wide" id="connectBtn">베개 연결하기</button>
-    <button id="startBtn">수면 시작</button>
-    <button id="stopBtn" disabled>수면 끝내기</button>
-  </div>
-  <label class="demo">
-    <input type="checkbox" id="demoBox">
-    <span>시연 모드
-      <small id="demoText"></small>
-    </span>
-  </label>
-  <p class="notice" id="notice"></p>
-
-  <h2>움직임 기록</h2>
-  <ol class="log" id="log"></ol>
-  <p class="muted" id="logEmpty">베개를 연결하고 누워 보세요. 머리를 들었다 눕히면 여기에 쌓여요.</p>
-  <button class="clear" id="clearBtn">기록 지우기</button>
+  <!-- ========== 달력 ========== -->
+  <section id="viewCal" hidden>
+    <div class="month">
+      <button id="prevMonth" aria-label="이전 달">‹</button>
+      <h2 id="monthTitle"></h2>
+      <button id="nextMonth" aria-label="다음 달">›</button>
+    </div>
+    <div class="cal" id="cal"></div>
+    <div class="cal-legend">
+      <span>칸의 숫자 = 그날 밤 수면 효율</span>
+      <span style="color:var(--sleep)">85% 이상</span>
+      <span style="color:var(--toss)">70~84%</span>
+      <span style="color:var(--away)">70% 미만</span>
+    </div>
+    <div class="detail" id="detail"><p class="muted">날짜를 누르면 그날 밤 기록이 나와요. 수면을 끝낸 아침 날짜에 저장돼요.</p></div>
+    <button class="textbtn" id="sampleBtn">예시 기록 채우기</button>
+  </section>
 </main>
 
 <script>
   const SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
   const CHAR_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
-  const KEY = 'sleepPillow.v2';
+  const KEY = 'sleepPillow.v2';          // 지금 기록 중인 밤
+  const HIST_KEY = 'sleepPillow.history'; // 끝난 밤들 { 'YYYY-MM-DD': [세션, …] }
   const DEMO_KEY = 'sleepPillow.demo';
 
   // 판단 기준 (밀리초)
-  // tossMax: 머리를 이 시간 안에 다시 눕히면 "뒤척임", 더 길면 "깸(베개에서 벗어남)"
-  // quietMin: 머리를 눕힌 채 이 시간 이상 조용하면 그 시작을 "잠든 시각"으로 봄
   const NORMAL = { tossMax: 60 * 1000, quietMin: 15 * 60 * 1000, epoch: 60 * 1000 };
   const DEMO   = { tossMax: 5 * 1000,  quietMin: 20 * 1000,      epoch: 2 * 1000 };
 
-  let data = load();
-  let demo = localStorage.getItem(DEMO_KEY) === '1';
   const $ = id => document.getElementById(id);
-  const cfg = () => (demo ? DEMO : NORMAL);
+  const read = (k, d) => { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch (e) { return d; } };
+  const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
 
-  function load() {
-    try { const raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch (e) {}
-    return { start: null, end: null, events: [] };
-  }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
+  let data = read(KEY, { start: null, end: null, events: [] });
+  let history = read(HIST_KEY, {});
+  let demo = localStorage.getItem(DEMO_KEY) === '1';
+  let viewMonth = new Date(); viewMonth.setDate(1);
+  let selected = null;
 
   // ---------- 시간 표시 ----------
   const fmtTime = t => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   const fmtShort = t => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-  function fmtClock(ms) {
-    const m = Math.max(0, Math.floor(ms / 60000));
-    return Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0');
-  }
+  const fmtClock = ms => { const m = Math.max(0, Math.floor(ms / 60000)); return Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0'); };
   function fmtDur(ms) {
     const s = Math.max(0, Math.round(ms / 1000));
     if (s < 60) return s + '초';
@@ -175,21 +180,17 @@
     if (h === 0) return m + '분' + (m < 10 && s % 60 ? ' ' + (s % 60) + '초' : '');
     return h + '시간 ' + (m % 60) + '분';
   }
+  const dateKey = t => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 
   // ---------- 블루투스 ----------
   function showNotice(msg) { const n = $('notice'); n.textContent = msg; n.classList.toggle('show', !!msg); }
   function setLink(on, text) {
-    $('link').classList.toggle('on', on);
-    $('linkText').textContent = text;
-    $('connectBtn').textContent = on ? '연결됨' : '베개 연결하기';
-    $('connectBtn').disabled = on;
+    $('link').classList.toggle('on', on); $('linkText').textContent = text;
+    $('connectBtn').textContent = on ? '연결됨' : '베개 연결하기'; $('connectBtn').disabled = on;
   }
   async function connect() {
     showNotice('');
-    if (!navigator.bluetooth) {
-      showNotice('이 브라우저는 블루투스를 쓸 수 없어요. 아이폰에서는 Bluefy 앱으로 이 페이지를 열어 주세요.');
-      return;
-    }
+    if (!navigator.bluetooth) { showNotice('이 브라우저는 블루투스를 쓸 수 없어요. 아이폰에서는 Bluefy 앱으로 이 페이지를 열어 주세요.'); return; }
     try {
       const device = await navigator.bluetooth.requestDevice({ filters: [{ services: [SERVICE_UUID] }] });
       device.addEventListener('gattserverdisconnected', () => {
@@ -215,20 +216,15 @@
     const dir = (parts[3] || '').trim().toUpperCase() === 'UP' ? 'UP' : 'DOWN';
     if (!data.start || data.end) startSession();
     data.events.push({ t: Date.now(), dir });
-    save();
-    render();
+    write(KEY, data); renderTonight();
   }
 
   // ---------- 수면 분석 ----------
-  // 1) 들림(UP) → 누움(DOWN)을 짝지어 "머리를 든 구간"을 만듦
-  // 2) 짧으면 뒤척임, 길면 깸
-  // 3) 머리를 눕힌 채 조용한 구간이 quietMin 이상인 첫 시점 = 잠든 시각
-  function analyze(now) {
-    const c = cfg();
-    const start = data.start, end = data.end || now;
-    const lifts = [];
-    let up = null;
-    for (const ev of data.events) {
+  function analyze(s, now) {
+    const c = (s.demo === undefined ? demo : s.demo) ? DEMO : NORMAL;
+    const start = s.start, end = s.end || now;
+    const lifts = []; let up = null;
+    for (const ev of s.events) {
       if (ev.dir === 'UP') { if (up === null) up = ev.t; }
       else if (up !== null) { lifts.push({ t0: up, t1: ev.t }); up = null; }
     }
@@ -237,108 +233,196 @@
       L.dur = (L.t1 || end) - L.t0;
       L.kind = L.dur <= c.tossMax ? (L.t1 === null ? 'now' : 'toss') : 'away';
     }
-
-    // 머리를 눕힌 구간들 (들린 구간 사이사이)
-    const downs = [];
-    let a = start;
+    const downs = []; let a = start;
     for (const L of lifts) { if (L.t0 > a) downs.push([a, L.t0]); a = L.t1 === null ? end : L.t1; }
     if (a < end) downs.push([a, end]);
     const quiet = downs.find(([x, y]) => y - x >= c.quietMin);
     const onset = quiet ? quiet[0] : null;
-
     const tosses = lifts.filter(L => L.kind === 'toss').length;
     const aways = onset === null ? [] : lifts.filter(L => L.kind === 'away' && L.t0 >= onset);
-    const awayTime = aways.reduce((s, L) => s + L.dur, 0);
+    const awayTime = aways.reduce((sum, L) => sum + L.dur, 0);
     const total = onset === null ? 0 : Math.max(0, end - onset - awayTime);
     const eff = end > start ? total / (end - start) : 0;
-    return { start, end, lifts, onset, tosses, aways, awayTime, total, eff };
+    return { start, end, lifts, onset, tosses, aways, awayTime, total, eff, cfg: c };
   }
-
   function epochs(A) {
     const span = A.end - A.start;
     if (span <= 0) return [];
-    const len = Math.max(cfg().epoch, span / 240); // 칸이 너무 많아지지 않게
+    const len = Math.max(A.cfg.epoch, span / 240);
     const n = Math.max(1, Math.ceil(span / len));
     const out = [];
     for (let i = 0; i < n; i++) {
       const e0 = A.start + i * len, e1 = Math.min(A.end, e0 + len);
-      let kind;
       const overlap = L => L.t0 < e1 && (L.t1 || A.end) > e0;
-      if (A.lifts.some(L => L.kind === 'away' && overlap(L))) kind = 'away';
-      else if (A.lifts.some(L => (L.kind === 'toss' || L.kind === 'now') && overlap(L))) kind = 'toss';
-      else if (A.onset === null || e1 <= A.onset) kind = 'before';
-      else kind = 'sleep';
-      out.push(kind);
+      if (A.lifts.some(L => L.kind === 'away' && overlap(L))) out.push('away');
+      else if (A.lifts.some(L => L.kind !== 'away' && overlap(L))) out.push('toss');
+      else if (A.onset === null || e1 <= A.onset) out.push('before');
+      else out.push('sleep');
     }
     return out;
   }
 
-  // ---------- 화면 ----------
-  function startSession() { data = { start: Date.now(), end: null, events: [] }; save(); render(); }
-  function stopSession() { if (data.start && !data.end) { data.end = Date.now(); save(); render(); } }
+  // 띠 + 리포트 + 기록 목록을 HTML로 만들기 (오늘 밤, 달력 상세 둘 다 사용)
+  function sessionHTML(s, now, live) {
+    const A = analyze(s, now);
+    const band = epochs(A).map(k => '<div class="' + k + '"></div>').join('');
+    const facts = [
+      [A.onset ? fmtShort(A.onset) : '아직', '잠든 시각'],
+      [A.onset ? fmtDur(A.onset - A.start) : '–', '잠드는 데 걸린 시간'],
+      [A.onset ? fmtDur(A.total) : '–', '총 수면 시간'],
+      [A.onset ? Math.round(A.eff * 100) + '%' : '–', '수면 효율'],
+      [A.tosses + '회', '뒤척임'],
+      [A.aways.length + '회' + (A.aways.length ? ' · ' + fmtDur(A.awayTime) : ''), '중간에 깸'],
+    ].map(([v, l]) => '<div class="fact"><b>' + v + '</b><span>' + l + '</span></div>').join('');
+    const items = A.lifts.slice().reverse().slice(0, 100).map(L => {
+      let what;
+      if (L.t1 === null) what = '<span class="now">머리를 든 상태 <em>' + fmtDur(L.dur) + '째</em></span>';
+      else if (L.kind === 'toss') what = '<span class="toss">뒤척임 <em>' + fmtDur(L.dur) + '</em></span>';
+      else what = '<span class="away">베개에서 벗어남 <em>' + fmtDur(L.dur) + '</em></span>';
+      return '<li>' + what + '<time>' + fmtTime(L.t0) + '</time></li>';
+    }).join('');
+    return '<div class="band">' + (band || '<div class="empty">수면 기록이 여기에 그려져요</div>') + '</div>'
+      + '<div class="band-ends"><span>' + fmtShort(A.start) + '</span><span>' + (s.end ? fmtShort(s.end) : '지금') + '</span></div>'
+      + '<div class="legend"><span><i style="background:var(--sleep)"></i>잠</span><span><i style="background:var(--toss)"></i>뒤척임</span>'
+      + '<span><i style="background:var(--away)"></i>깸(베개에서 벗어남)</span><span><i style="background:var(--before)"></i>잠들기 전</span></div>'
+      + '<div class="report">' + facts + '</div>'
+      + '<p class="caveat">움직임으로 추정한 값이에요. 깊은 잠과 렘수면은 구분하지 못해요.' + (s.demo ? ' 시연 모드 기준으로 계산했어요.' : '') + '</p>'
+      + '<h2>움직임 기록</h2>'
+      + (items ? '<ol class="log">' + items + '</ol>' : '<p class="muted">' + (live ? '머리를 들었다 눕히면 여기에 쌓여요.' : '이날은 움직임 기록이 없어요.') + '</p>');
+  }
 
-  function render() {
+  // ---------- 오늘 밤 ----------
+  function startSession() { data = { start: Date.now(), end: null, events: [], demo }; write(KEY, data); renderTonight(); }
+  function stopSession() {
+    if (!data.start || data.end) return;
+    data.end = Date.now();
+    const k = dateKey(data.end);              // 아침(끝낸) 날짜에 저장
+    (history[k] = history[k] || []).push(data);
+    write(HIST_KEY, history); write(KEY, data);
+    renderTonight();
+  }
+  function renderTonight() {
     const now = Date.now();
     const running = data.start && !data.end;
     $('startBtn').disabled = !!running;
     $('stopBtn').disabled = !running;
+    $('demoBox').disabled = !!running;
     $('demoText').textContent = demo
       ? '기준을 짧게 했어요: 5초 안에 다시 누우면 뒤척임, 더 길면 깸, 20초 조용하면 잠든 것으로 봐요.'
       : '켜면 기준 시간이 짧아져서 몇 분 안에 결과를 볼 수 있어요. 실제 수면은 끈 상태로 기록하세요.';
-
     if (!data.start) {
-      $('state').textContent = '기록 시작 전';
-      $('clock').textContent = '0:00';
+      $('state').textContent = '기록 시작 전'; $('clock').textContent = '0:00';
       $('since').textContent = '수면 시작을 누르면 시간이 흘러요';
-      $('band').innerHTML = '<div class="empty">수면 기록이 여기에 그려져요</div>';
-      $('bandStart').textContent = '누운 시각'; $('bandEnd').textContent = '지금';
-      ['onset', 'latency', 'total', 'eff'].forEach(id => $(id).textContent = '–');
-      $('tosses').textContent = '0회'; $('wakes').textContent = '0회';
-      $('log').innerHTML = ''; $('logEmpty').style.display = 'block';
+      $('tonightBody').innerHTML = '<div class="band"><div class="empty">수면 기록이 여기에 그려져요</div></div>';
       return;
     }
-
-    const A = analyze(now);
-    $('state').textContent = running ? (A.onset ? '잠든 상태로 기록 중' : '잠들기를 기다리는 중') : '아침 리포트';
+    const A = analyze(data, now);
+    $('state').textContent = running ? (A.onset ? '잠든 상태로 기록 중' : '잠들기를 기다리는 중') : '아침 리포트 · 달력에 저장했어요';
     $('clock').textContent = fmtClock(A.end - A.start);
     $('since').textContent = fmtShort(A.start) + '부터' + (data.end ? ' ' + fmtShort(data.end) + '까지' : ' 누워 있어요');
-
-    const band = $('band');
-    band.innerHTML = '';
-    epochs(A).forEach(k => { const d = document.createElement('div'); d.className = k; band.appendChild(d); });
-    $('bandStart').textContent = fmtShort(A.start);
-    $('bandEnd').textContent = data.end ? fmtShort(data.end) : '지금';
-
-    $('onset').textContent = A.onset ? fmtShort(A.onset) : '아직';
-    $('latency').textContent = A.onset ? fmtDur(A.onset - A.start) : '–';
-    $('total').textContent = A.onset ? fmtDur(A.total) : '–';
-    $('eff').textContent = A.onset ? Math.round(A.eff * 100) + '%' : '–';
-    $('tosses').textContent = A.tosses + '회';
-    $('wakes').textContent = A.aways.length + '회' + (A.aways.length ? ' · ' + fmtDur(A.awayTime) : '');
-
-    const log = $('log');
-    log.innerHTML = '';
-    A.lifts.slice().reverse().slice(0, 100).forEach(L => {
-      const li = document.createElement('li');
-      const what = document.createElement('span');
-      if (L.t1 === null) {
-        what.className = 'now';
-        what.innerHTML = '머리를 든 상태 <em>' + fmtDur(L.dur) + '째</em>';
-      } else if (L.kind === 'toss') {
-        what.className = 'toss';
-        what.innerHTML = '뒤척임 <em>' + fmtDur(L.dur) + '</em>';
-      } else {
-        what.className = 'away';
-        what.innerHTML = '베개에서 벗어남 <em>' + fmtDur(L.dur) + '</em>';
-      }
-      const tm = document.createElement('time');
-      tm.textContent = fmtTime(L.t0);
-      li.append(what, tm);
-      log.appendChild(li);
-    });
-    $('logEmpty').style.display = A.lifts.length ? 'none' : 'block';
+    $('tonightBody').innerHTML = sessionHTML(data, now, true);
   }
 
+  // ---------- 달력 ----------
+  function mainSession(k) {   // 하루에 여러 번 잤으면 가장 긴 기록을 대표로
+    const list = history[k] || [];
+    return list.reduce((best, s) => (!best || (s.end - s.start) > (best.end - best.start)) ? s : best, null);
+  }
+  function renderCal() {
+    const y = viewMonth.getFullYear(), m = viewMonth.getMonth();
+    $('monthTitle').textContent = y + '년 ' + (m + 1) + '월';
+    const cal = $('cal'); cal.innerHTML = '';
+    ['일', '월', '화', '수', '목', '금', '토'].forEach(w => { const d = document.createElement('div'); d.className = 'wd'; d.textContent = w; cal.appendChild(d); });
+    const first = new Date(y, m, 1).getDay();
+    const days = new Date(y, m + 1, 0).getDate();
+    for (let i = 0; i < first; i++) cal.appendChild(document.createElement('div'));
+    const todayKey = dateKey(Date.now());
+    for (let d = 1; d <= days; d++) {
+      const k = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      const s = mainSession(k);
+      const cell = document.createElement('button');
+      cell.className = 'day' + (k === todayKey ? ' today' : '') + (k === selected ? ' sel' : '');
+      let inner = '<span>' + d + '</span>';
+      if (s) {
+        const A = analyze(s, s.end);
+        const pct = A.onset ? Math.round(A.eff * 100) : null;
+        cell.classList.add('has', pct === null ? 'low' : pct >= 85 ? 'good' : pct >= 70 ? 'mid' : 'low');
+        inner += '<b>' + (pct === null ? '–' : pct + '%') + '</b>' + (s.example ? '<small>예시</small>' : '<small>&nbsp;</small>');
+        cell.addEventListener('click', () => { selected = k; renderCal(); });
+        cell.setAttribute('aria-label', (m + 1) + '월 ' + d + '일 수면 효율 ' + (pct === null ? '없음' : pct + '%'));
+      } else {
+        cell.disabled = true;
+        inner += '<b>&nbsp;</b><small>&nbsp;</small>';
+      }
+      cell.innerHTML = inner;
+      cal.appendChild(cell);
+    }
+    renderDetail();
+    $('sampleBtn').textContent = Object.values(history).flat().some(s => s.example) ? '예시 기록 지우기' : '예시 기록 채우기';
+  }
+  function renderDetail() {
+    const box = $('detail');
+    const s = selected && mainSession(selected);
+    if (!s) { box.innerHTML = '<p class="muted">날짜를 누르면 그날 밤 기록이 나와요. 수면을 끝낸 아침 날짜에 저장돼요.</p>'; return; }
+    const [y, mo, d] = selected.split('-').map(Number);
+    const wd = ['일', '월', '화', '수', '목', '금', '토'][new Date(y, mo - 1, d).getDay()];
+    box.innerHTML = '<h3>' + mo + '월 ' + d + '일 (' + wd + ') 아침' + (s.example ? '<span class="tag">예시</span>' : '') + '</h3>'
+      + '<p class="muted">' + fmtShort(s.start) + '에 누워서 ' + fmtShort(s.end) + '에 일어났어요 · ' + fmtClock(s.end - s.start) + '</p>'
+      + sessionHTML(s, s.end, false)
+      + '<button class="textbtn" id="delDay">이날 기록 지우기</button>';
+    $('delDay').addEventListener('click', () => {
+      if (confirm(mo + '월 ' + d + '일 기록을 지울까요?')) { delete history[selected]; write(HIST_KEY, history); selected = null; renderCal(); }
+    });
+  }
+
+  // 예시 기록: 발표용으로 달력이 채워진 모습을 보여주기 위한 가짜 데이터 (칸에 "예시"로 표시됨)
+  function makeSamples() {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    for (let back = 1; back <= 24; back++) {
+      if (Math.random() < 0.15) continue;
+      const morning = new Date(today); morning.setDate(today.getDate() - back);
+      const k = dateKey(morning);
+      if (history[k] && history[k].some(s => !s.example)) continue;
+      const start = morning.getTime() - (60 + Math.random() * 120) * 60000;       // 전날 밤 10~12시
+      const end = morning.getTime() + (6 * 60 + 20 + Math.random() * 90) * 60000;  // 아침 6:20~7:50
+      const ev = [];
+      let t = start + 30000;
+      const latency = (5 + Math.random() * Math.random() * 70) * 60000;
+      while (t < start + latency) { ev.push({ t, dir: 'UP' }, { t: t + 4000 + Math.random() * 20000, dir: 'DOWN' }); t += (3 + Math.random() * 8) * 60000; }
+      t = start + latency + (16 + Math.random() * 20) * 60000;
+      let wakes = Math.random() < 0.5 ? 1 + Math.floor(Math.random() * 3) : 0;
+      while (t < end - 10 * 60000) {
+        if (wakes > 0 && Math.random() < 0.25) { const dur = (5 + Math.random() * 35) * 60000; ev.push({ t, dir: 'UP' }, { t: t + dur, dir: 'DOWN' }); t += dur; wakes--; }
+        else ev.push({ t, dir: 'UP' }, { t: t + 3000 + Math.random() * 30000, dir: 'DOWN' });
+        t += (10 + Math.random() * 50) * 60000;
+      }
+      history[k] = [{ start, end, events: ev, demo: false, example: true }];
+    }
+    write(HIST_KEY, history);
+  }
+  function clearSamples() {
+    for (const k of Object.keys(history)) {
+      history[k] = history[k].filter(s => !s.example);
+      if (!history[k].length) delete history[k];
+    }
+    write(HIST_KEY, history);
+  }
+
+  // ---------- 탭, 버튼 ----------
+  function showTab(cal) {
+    $('tabTonight').setAttribute('aria-selected', String(!cal));
+    $('tabCal').setAttribute('aria-selected', String(cal));
+    $('viewTonight').hidden = cal; $('viewCal').hidden = !cal;
+    cal ? renderCal() : renderTonight();
+  }
+  $('tabTonight').addEventListener('click', () => showTab(false));
+  $('tabCal').addEventListener('click', () => showTab(true));
+  $('prevMonth').addEventListener('click', () => { viewMonth.setMonth(viewMonth.getMonth() - 1); renderCal(); });
+  $('nextMonth').addEventListener('click', () => { viewMonth.setMonth(viewMonth.getMonth() + 1); renderCal(); });
+  $('sampleBtn').addEventListener('click', () => {
+    if (Object.values(history).flat().some(s => s.example)) clearSamples(); else makeSamples();
+    selected = null; renderCal();
+  });
   $('connectBtn').addEventListener('click', connect);
   $('startBtn').addEventListener('click', startSession);
   $('stopBtn').addEventListener('click', stopSession);
@@ -346,14 +430,11 @@
   $('demoBox').addEventListener('change', e => {
     demo = e.target.checked;
     try { localStorage.setItem(DEMO_KEY, demo ? '1' : '0'); } catch (err) {}
-    render();
-  });
-  $('clearBtn').addEventListener('click', () => {
-    if (confirm('지금까지의 수면 기록을 모두 지울까요?')) { data = { start: null, end: null, events: [] }; save(); render(); }
+    renderTonight();
   });
 
-  render();
-  setInterval(render, 2000);
+  renderTonight();
+  setInterval(() => { if (!$('viewTonight').hidden) renderTonight(); }, 2000);
 </script>
 </body>
 </html>
